@@ -27,7 +27,7 @@ const loginForm = async () => {
 
         message.value = response.data.message
 
-        router.push({ name: 'MyImages' })
+        router.push({ name: 'Home' })
   } catch (error) {
     if (error.response) {
             message.value = error.response.data.message

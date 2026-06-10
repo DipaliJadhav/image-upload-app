@@ -1,47 +1,141 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
-import { ChevronDownIcon } from '@heroicons/vue/16/solid'
+import { ref, onMounted } from 'vue'
+import axiosClient from '../axios.js'
+
+const images = ref([])
+
+const getImages = async () => {
+
+    try {
+
+        const token = localStorage.getItem('token')
+
+        const response = await axiosClient.get(
+            '/api/images',
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+
+        images.value = response.data
+
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+onMounted(() => {
+    getImages()
+})
+
+const showDeleteModal = ref(false)
+const selectedImage = ref(null)
+
+const openDeleteModal = (image) => {
+    selectedImage.value = image
+    showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+    selectedImage.value = null
+    showDeleteModal.value = false
+}
+
+const deleteImage = async () => {
+
+    try {
+
+        const token = localStorage.getItem('token')
+
+        const response = await axiosClient.delete(`/api/images/${selectedImage.value.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        )
+        console.log(response.data)    
+        images.value = images.value.filter(
+        image => image.id !== selectedImage.value.id
+        )
+
+        closeDeleteModal()
+
+    } catch (error) {
+
+        console.error(error)
+
+    }
+}
+
+
 </script>
 
 <template>
   <header class="relative bg-white shadow-sm">
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">Upload Image</h1>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">My Images</h1>
       </div>
   </header>
     <main>
-      <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        
-        <div class="mb-4">
-            <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900">Cover photo</label>
-            <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
-              <div class="text-center">
-                <PhotoIcon class="mx-auto size-12 text-gray-300" aria-hidden="true" />
-                <div class="mt-4 flex text-sm/6 text-gray-600">
-                  <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500">
-                    <span>Upload a file</span>
-                    <input id="file-upload" name="file-upload" type="file" class="sr-only" />
-                  </label>
-                  <p class="pl-1">or drag and drop</p>
-                </div>
-                <p class="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
-              </div>
-            </div>
-          </div>
+      <div
+        v-for="image in images"
+        :key="image.id"
+        class="border p-4 rounded mb-4">
+          <h3>{{ image.label }}</h3>
 
-          <div class="mb-4">
-            <label for="image-label" class="block text-sm/6 font-medium text-gray-900">Image Label</label>
-            <div class="mt-2">
-              <input type="text" name="image-label" id="image-label" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+          <img
+              :src="`http://127.0.0.1:8000/storage/${image.image_path}`"
+              class="w-48 h-48 object-cover"
+          >
+
+          <button
+              @click="openDeleteModal(image)"
+              class="mt-2 bg-red-500 text-white px-4 py-2 rounded"
+          >
+              Delete
+          </button>
+      </div>
+        
+      <div
+        v-if="showDeleteModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+
+            <h2 class="text-xl font-semibold mb-4">
+                Delete Image
+            </h2>
+
+            <p class="mb-6">
+                Are you sure you want to delete
+                <strong>{{ selectedImage?.label }}</strong>?
+            </p>
+
+            <div class="flex justify-end gap-2">
+
+                <button
+                    @click="closeDeleteModal"
+                    class="px-4 py-2 border rounded"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    @click="deleteImage"
+                    :disabled="isDeleting"
+                    class="px-4 py-2 bg-red-600 text-white rounded"
+                >
+                    {{ isDeleting ? 'Deleting...' : 'Delete' }}
+                </button>
+
             </div>
-          </div>
-          <div class="mt-6 flex items-center gap-x-6">      
-            <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Upload</button>
-          </div>
+
+        </div>
       </div>
     </main>
-  
 </template>
 <style scoped>
 </style>

@@ -31,7 +31,7 @@ class ImageController extends Controller
     {
         $request->validate([
         'label' => 'required',
-        'image' => 'required|image|max:2048'
+        'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
         $path = $request->file('image')->store('uploads','public');
@@ -42,7 +42,9 @@ class ImageController extends Controller
             'image_path' => $path
         ]);
 
-        return response()->json($image);
+        return response()->json([
+        'message' => 'Image uploaded successfully'
+        ]);
     }
 
     /**
@@ -72,8 +74,9 @@ class ImageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ImageApp $imageApp)
+    public function destroy(ImageApp $image)
     {
+        
         if ($image->user_id != auth()->id()) {
         return response()->json([
             'message' => 'Unauthorized'
@@ -85,7 +88,7 @@ class ImageController extends Controller
         $image->delete();
 
         return response()->json([
-            'message' => 'Deleted'
+        'message' => 'Image deleted successfully'
         ]);
     }
 }
