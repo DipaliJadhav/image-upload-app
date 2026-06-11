@@ -9,11 +9,35 @@ import axiosClient from '../axios.js'
 const label = ref('')
 const image = ref(null)
 const message = ref('')
+const imagePreview = ref(null)
+
+const toast = ref({
+    show: false,
+    message: '',
+    type: ''
+})
+
+const showToast = (message, type = 'success') => {
+
+    toast.value = {
+        show: true,
+        message,
+        type
+    }
+
+    setTimeout(() => {
+        toast.value.show = false
+    }, 1500)
+}
 
 const handleFileUpload = (event) => {
-  const file = event.target.files[0]; 
-  image.value = file;
-};
+
+    image.value = event.target.files[0]
+
+    if (image.value) {
+        imagePreview.value = URL.createObjectURL(image.value)
+    }
+}
 const uploadImage = async () => {
 
     try {
@@ -37,16 +61,18 @@ const uploadImage = async () => {
         )
 
         message.value = response.data.message
-       
+        showToast(response.data.message,'success')
         label.value = ''
         image.value = null
+        imagePreview.value = null
         setTimeout(() => {
             router.push({ name: 'Home' })
-        }, 1500)
+        }, 3000)
 
     } catch (error) {
 
         console.error(error)
+        showToast('Failed to upload image', 'error')
 
         if (error.response) {
             message.value = error.response.data.message
@@ -65,7 +91,7 @@ const uploadImage = async () => {
   </header>
     <main>
       <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <p>{{ message }} ffff</p>
+        
         <div class="mb-4">
             <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900">Cover photo</label>
             <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
@@ -83,6 +109,16 @@ const uploadImage = async () => {
             </div>
           </div>
 
+          <div v-if="imagePreview" class="mt-4">
+
+              <img
+                  :src="imagePreview"
+                  alt="Preview"
+                  class="w-64 h-64 object-cover rounded border"
+              >
+
+          </div>
+
           <div class="mb-4">
             <label for="label" class="block text-sm/6 font-medium text-gray-900">Image Label</label>
             <div class="mt-2">
@@ -94,6 +130,15 @@ const uploadImage = async () => {
           </div>
       </div>
       
+      <div
+          v-if="toast.show"
+          class="fixed top-5 right-5 px-4 py-3 rounded shadow-lg text-white z-50"
+          :class="toast.type === 'success'
+              ? 'bg-green-500'
+              : 'bg-red-500'"
+      >
+          {{ toast.message }}
+      </div>
     </main>
   
 </template>

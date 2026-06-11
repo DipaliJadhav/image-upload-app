@@ -4,7 +4,24 @@ import { ref, onMounted } from 'vue'
 import axiosClient from '../axios.js'
 
 const images = ref([])
+const toast = ref({
+    show: false,
+    message: '',
+    type: ''
+})
 
+const showToast = (message, type = 'success') => {
+
+    toast.value = {
+        show: true,
+        message,
+        type
+    }
+
+    setTimeout(() => {
+        toast.value.show = false
+    }, 1500)
+}
 const getImages = async () => {
 
     try {
@@ -57,7 +74,7 @@ const deleteImage = async () => {
                 }
             }
         )
-        console.log(response.data)    
+        showToast(response.data.message,'success')   
         images.value = images.value.filter(
         image => image.id !== selectedImage.value.id
         )
@@ -81,10 +98,11 @@ const deleteImage = async () => {
       </div>
   </header>
     <main>
+    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div
         v-for="image in images"
         :key="image.id"
-        class="border p-4 rounded mb-4">
+        class="p-4 rounded mb-4">
           <h3>{{ image.label }}</h3>
 
           <img
@@ -100,7 +118,10 @@ const deleteImage = async () => {
           </button>
       </div>
         
-      <div
+      
+    </div>
+
+    <div
         v-if="showDeleteModal"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg p-6 w-96">
@@ -135,6 +156,14 @@ const deleteImage = async () => {
 
         </div>
       </div>
+        <div
+            v-if="toast.show"
+            class="fixed top-5 right-5 px-4 py-3 rounded shadow-lg text-white z-50"
+            :class="toast.type === 'success'
+                ? 'bg-green-500'
+                : 'bg-red-500'" >
+            {{ toast.message }}
+        </div>
     </main>
 </template>
 <style scoped>
