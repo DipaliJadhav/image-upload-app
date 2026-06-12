@@ -25,11 +25,25 @@ class ImageUploadTest extends TestCase
             $response = $this->withHeader(
                 'Authorization',
                 'Bearer ' . $token
-            )->post('/api/images', [
+            )->postJson('/api/images', [
                 'label' => 'Test Image',
                 'image' => $file
             ]);
 
             $response->assertStatus(200);
+        }
+
+    public function test_user_cannot_upload_image_without_login(): void
+        {
+            Storage::fake('public');
+
+            $file = UploadedFile::fake()->image('photo.jpg');
+
+            $response = $this->postJson('/api/images', [
+                'label' => 'Test Image',
+                'image' => $file
+            ]);
+
+            $response->assertStatus(401);
         }
 }

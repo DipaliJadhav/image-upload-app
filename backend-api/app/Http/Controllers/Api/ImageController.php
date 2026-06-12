@@ -29,12 +29,18 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth()->check()) {
+            return response()->json([
+                'message' => 'Unauthenticated.'
+            ], 401);
+        }
+
         $request->validate([
-        'label' => 'required',
-        'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048'
+            'label' => 'required',
+            'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
-        $path = $request->file('image')->store('uploads','public');
+        $path = $request->file('image')->store('uploads', 'public');
 
         $image = ImageApp::create([
             'user_id' => auth()->id(),
@@ -43,7 +49,7 @@ class ImageController extends Controller
         ]);
 
         return response()->json([
-        'message' => 'Image uploaded successfully'
+            'message' => 'Image uploaded successfully'
         ]);
     }
 
