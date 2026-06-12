@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import { ref, onMounted } from 'vue'
-import axiosClient from '../axios.js'
+import axiosClient, { API_URL }  from '../axios.js'
 
 const images = ref([])
 const toast = ref({
@@ -106,7 +106,7 @@ const deleteImage = async () => {
           <h3>{{ image.label }}</h3>
 
           <img
-              :src="`http://127.0.0.1:8000/storage/${image.image_path}`"
+              :src="`${API_URL}/storage/${image.image_path}`"
               class="w-48 h-48 object-cover"
           >
 

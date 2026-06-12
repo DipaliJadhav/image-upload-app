@@ -12,7 +12,7 @@ use App\Models\ImageApp;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    use HasFactory;
     use HasApiTokens, Notifiable;
 
     /**
