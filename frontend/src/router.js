@@ -5,6 +5,7 @@ import Images from './pages/Images.vue'
 import Login from './pages/Login.vue'
 import Register from './pages/Register.vue'
 import NotFound from './pages/NotFound.vue'
+import Upload from './pages/Upload.vue'
 const routes = [
   {
   path: '/',
@@ -12,6 +13,7 @@ const routes = [
   children: [ 
     {path: '/', name: 'Home', component: Home},
     {path: '/images', name: 'Images', component: Images},
+    {path: '/upload', name: 'Upload', component: Upload},
   ]
   },
   { path: '/login', name: 'Login', component: Login},

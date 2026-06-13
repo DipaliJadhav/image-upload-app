@@ -56,9 +56,11 @@ class ImageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ImageApp $imageApp)
+    public function show()
     {
-        //
+         return ImageApp::with('user')
+                    ->latest()
+                    ->paginate(5);
     }
 
     /**
