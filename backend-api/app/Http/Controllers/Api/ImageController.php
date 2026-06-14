@@ -58,9 +58,18 @@ class ImageController extends Controller
      */
     public function show()
     {
-         return ImageApp::with('user')
+        if (!auth()->check()) {
+            return response()->json([
+                'message' => 'Unauthenticated.'
+            ], 401);
+        }
+        else
+            {
+                return ImageApp::with('user')
                     ->latest()
                     ->paginate(5);
+            }
+         
     }
 
     /**
