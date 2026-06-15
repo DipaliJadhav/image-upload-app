@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ImageApp;
 use Illuminate\Support\Facades\Storage;
+use App\Jobs\ProcessImageJob;
 
 class ImageController extends Controller
 {
@@ -34,6 +35,8 @@ class ImageController extends Controller
                 'message' => 'Unauthenticated.'
             ], 401);
         }
+        else
+        {    
 
         $request->validate([
             'label' => 'required',
@@ -45,12 +48,15 @@ class ImageController extends Controller
         $image = ImageApp::create([
             'user_id' => auth()->id(),
             'label' => $request->label,
-            'image_path' => $path
+            'image_path' => $path,
+            'status' => 'pending',
         ]);
+        ProcessImageJob::dispatch($image);
 
         return response()->json([
             'message' => 'Image uploaded successfully'
         ]);
+        }
     }
 
     /**

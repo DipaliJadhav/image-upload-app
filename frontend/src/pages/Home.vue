@@ -5,26 +5,33 @@ import axiosClient, { API_URL }  from '../axios.js'
 
 const images = ref([])
 const loading = ref(false)
-
-const getImages = async () => {
+const pagination = ref({})
+const getImages = async (page = 1) => {
     try {
         const token = localStorage.getItem('token')
         loading.value = true
 
-        const response = await axiosClient.get('/api/feed', {
+        const response = await axiosClient.get(`/api/feed?page=${page}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
 
         images.value = response.data.data
+        pagination.value = response.data
     } catch (error) {
         console.error(error)
     } finally {
         loading.value = false
     }
 }
+const getPageNumber = (url) => {
+    if (!url) return
 
+    const params = new URL(url).searchParams
+
+    return params.get('page')
+}
 onMounted(() => {
     getImages()
 })
@@ -40,7 +47,7 @@ onMounted(() => {
   </header>
     <main>
         <div v-if="loading">
-            <<div class="mx-auto w-full max-w-sm rounded-md border border-blue-300 p-4">
+            <div class="mx-auto w-full max-w-sm rounded-md border border-blue-300 p-4">
                 <div class="flex animate-pulse space-x-4">
                     <div class="size-10 rounded-full bg-gray-200"></div>
                     <div class="flex-1 space-y-6 py-1">
@@ -73,7 +80,20 @@ onMounted(() => {
       
     </div>
 
-    
+    <div class="flex justify-center gap-2 mt-6">
+    <button
+        v-for="link in pagination.links"
+        :key="link.label"
+        :disabled="!link.url"
+        @click="getImages(getPageNumber(link.url))"
+        class="px-3 py-2 border rounded"
+        :class="{
+            'font-bold': link.active,
+            'opacity-50': !link.url
+        }"
+        v-html="link.label"
+    />
+</div>
         
     </main>
 </template>

@@ -102,7 +102,7 @@ const deleteImage = async () => {
   </header>
     <main>
      <div v-if="loading">
-            <<div class="mx-auto w-full max-w-sm rounded-md border border-blue-300 p-4">
+            <div class="mx-auto w-full max-w-sm rounded-md border border-blue-300 p-4">
                 <div class="flex animate-pulse space-x-4">
                     <div class="size-10 rounded-full bg-gray-200"></div>
                     <div class="flex-1 space-y-6 py-1">

@@ -12,7 +12,10 @@ class ImageApp extends Model
     protected $fillable = [
     'user_id',
     'label',
-    'image_path'
+    'image_path',
+    'status',
+    'file_size',
+    'mime_type'
     ];
 
     public function user()
