@@ -100,12 +100,12 @@ class ImageController extends Controller
     public function destroy(ImageApp $image)
     {
         
-        if ($image->user_id != auth()->id()) {
-        return response()->json([
-            'message' => 'Unauthorized'
-        ],403);
-        }
-
+        // if ($image->user_id != auth()->id()) {
+        // return response()->json([
+        //     'message' => 'Unauthorized'
+        // ],403);
+        // }
+        $this->authorize('delete', $image);
         Storage::disk('public')->delete($image->image_path);
 
         $image->delete();

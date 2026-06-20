@@ -1,12 +1,11 @@
 # Laravel Vue Image Manager
 
 ## Features
-- User Registration
-- User Login
-- Image Upload
-- Image Preview
-- Image Delete
-- Route Protection
+- User authentication with Laravel Sanctum
+- Image upload and deletion
+- Background image processing using Laravel Jobs & Queues
+- Automatic metadata extraction (file size and MIME type)
+- PHPUnit feature tests
 
 ## Tech Stack
 - Laravel 12
