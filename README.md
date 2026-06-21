@@ -1,4 +1,7 @@
 # Laravel Vue Image Manager
+
+[![Laravel](https://github.com/DipaliJadhav/image-upload-app/actions/workflows/laravel.yml/badge.svg)](https://github.com/DipaliJadhav/image-upload-app/actions/workflows/laravel.yml)
+
 A full-stack image management application built with Laravel 12 and Vue 3. Users can upload images, manage their personal gallery, browse a public feed, and perform secure image operations with background processing.
 
 ## Features
