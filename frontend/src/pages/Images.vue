@@ -5,6 +5,8 @@ import axiosClient, { API_URL }  from '../axios.js'
 
 const images = ref([])
 const loading = ref(false)
+const pagination = ref({})
+
 const toast = ref({
     show: false,
     message: '',
@@ -23,29 +25,31 @@ const showToast = (message, type = 'success') => {
         toast.value.show = false
     }, 1500)
 }
-const getImages = async () => {
-
+const getImages = async (page = 1) => {
     try {
-
         const token = localStorage.getItem('token')
         loading.value = true
 
-        const response = await axiosClient.get(
-            '/api/images',
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+        const response = await axiosClient.get(`/api/images?page=${page}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
-        )
+        })
 
-        images.value = response.data
-
+        images.value = response.data.data
+        pagination.value = response.data.meta
     } catch (error) {
         console.error(error)
     } finally {
         loading.value = false
     }
+}
+const getPageNumber = (url) => {
+    if (!url) return
+
+    const params = new URL(url).searchParams
+
+    return params.get('page')
 }
 
 onMounted(() => {
@@ -127,7 +131,7 @@ const deleteImage = async () => {
           <h3 class="text-center">{{ image.label }}</h3>
 
           <img
-              :src="`${API_URL}/storage/${image.image_path}`"
+              :src="image.image_path"
               class="mx-auto w-70 h-70 object-cover"
           >
 
@@ -140,6 +144,21 @@ const deleteImage = async () => {
       </div>
         
       
+    </div>
+
+    <div class="flex justify-center gap-2 mt-6">
+        <button
+            v-for="link in pagination.links"
+            :key="link.label"
+            :disabled="!link.url"
+            @click="getImages(getPageNumber(link.url))"
+            class="px-3 py-2 border rounded"
+            :class="{
+                'font-bold': link.active,
+                'opacity-50': !link.url
+            }"
+            v-html="link.label"
+        />
     </div>
 
     <div

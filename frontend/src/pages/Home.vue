@@ -18,7 +18,7 @@ const getImages = async (page = 1) => {
         })
 
         images.value = response.data.data
-        pagination.value = response.data
+        pagination.value = response.data.meta
     } catch (error) {
         console.error(error)
     } finally {
@@ -71,7 +71,7 @@ onMounted(() => {
           <h3 class="text-center">{{ image.label }}</h3>
 
           <img
-              :src="`${API_URL}/storage/${image.image_path}`"
+              :src="image.image_path"
               class="mx-auto w-70 h-70 object-cover"
           >
 
@@ -81,19 +81,19 @@ onMounted(() => {
     </div>
 
     <div class="flex justify-center gap-2 mt-6">
-    <button
-        v-for="link in pagination.links"
-        :key="link.label"
-        :disabled="!link.url"
-        @click="getImages(getPageNumber(link.url))"
-        class="px-3 py-2 border rounded"
-        :class="{
-            'font-bold': link.active,
-            'opacity-50': !link.url
-        }"
-        v-html="link.label"
-    />
-</div>
+        <button
+            v-for="link in pagination.links"
+            :key="link.label"
+            :disabled="!link.url"
+            @click="getImages(getPageNumber(link.url))"
+            class="px-3 py-2 border rounded"
+            :class="{
+                'font-bold': link.active,
+                'opacity-50': !link.url
+            }"
+            v-html="link.label"
+        />
+    </div>
         
     </main>
 </template>

@@ -7,14 +7,16 @@ use Illuminate\Http\Request;
 use App\Models\ImageApp;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ProcessImageJob;
+use App\Http\Resources\ImageResource;
 
 class ImageController extends Controller
 {
     public function index()
     {
-        return ImageApp::where('user_id', auth()->id())
+        $images = ImageApp::where('user_id', auth()->id())
         ->latest()
-        ->get();
+        ->paginate(4);
+        return ImageResource::collection($images);
     }
 
     /**
@@ -54,27 +56,21 @@ class ImageController extends Controller
         ProcessImageJob::dispatch($image);
 
         return response()->json([
-            'message' => 'Image uploaded successfully'
-        ]);
+            'message' => 'Image uploaded successfully',
+            'image' => new ImageResource($image),
+        ], 201);
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function feed()
     {
-        if (!auth()->check()) {
-            return response()->json([
-                'message' => 'Unauthenticated.'
-            ], 401);
-        }
-        else
-            {
-                return ImageApp::with('user')
-                    ->latest()
-                    ->paginate(5);
-            }
+        $images = ImageApp::latest()
+        ->paginate(4);
+
+        return ImageResource::collection($images);
          
     }
 
@@ -100,11 +96,7 @@ class ImageController extends Controller
     public function destroy(ImageApp $image)
     {
         
-        // if ($image->user_id != auth()->id()) {
-        // return response()->json([
-        //     'message' => 'Unauthorized'
-        // ],403);
-        // }
+
         $this->authorize('delete', $image);
         Storage::disk('public')->delete($image->image_path);
 
