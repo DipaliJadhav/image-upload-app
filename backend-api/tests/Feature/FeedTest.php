@@ -57,13 +57,13 @@ class FeedTest extends TestCase
         $response->assertOk();
 
         $response->assertJsonPath(
-            'current_page',
+            'meta.current_page',
             1
         );
 
         $response->assertJsonPath(
-            'per_page',
-            5
+            'meta.per_page',
+            4
         );
     }
 }
